@@ -86,7 +86,7 @@ def success_view(request):
 
 
 
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def Chatmessages(request):
     dorms = Dorm.objects.all()
 
@@ -140,7 +140,7 @@ def role_selection(request):
                 return redirect('signup')  # Redirect to the login page
         return render(request, 'login.html')
 
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def owner_dashboard(request):
     dromTypes=(
                 ('Single Room','Single Room'),
@@ -323,7 +323,7 @@ def logout_view(request):
         return redirect('home')
 
 
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def dorm_create(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -332,7 +332,7 @@ def dorm_create(request):
         place_type = request.POST.get('place_type')
         images = request.FILES
 
-        matchmate = 'matchmate' in request.POST
+        # matchmate = 'matchmate' in request.POST
 
         # Create a new Dorm instance and save it
         dorm = Dorm(
@@ -341,7 +341,7 @@ def dorm_create(request):
             place_type=place_type,
             description=description,
             owner=request.user,
-            availability_status=matchmate
+            availability_status=True
             # Assuming you're setting this to True when submitted
         )
         dorm.save()
@@ -356,32 +356,34 @@ def dorm_create_part_2(request, dorm_id):
     if request.method == 'POST':
         # Collect basic dorm information from form inputs
         
-        guests = request.POST.get('guests')
-        bedrooms =request.POST['bedrooms'].replace('(','').replace(')','').replace(',','')
-        beds = int(request.POST['beds'][0])
+        guestsa = request.POST.get('guests')
+        bedroomsa =request.POST['bedrooms'].replace('(','').replace(')','').replace(',','')
+        bedsa = int(request.POST['beds'])
         bathroomsa = int(request.POST['bathrooms'])
         if bathroomsa:  # Check if the value is not None or an empty string
             bathroomsa = int(bathroomsa)
         else:
             bathroomsa = None
         price = request.POST.get('price')
+        deposit = request.POST.get('deposit')
+        utilities = request.POST.get('utilities')
         print(request.POST)
         selected_amenities = request.POST.getlist('amenities')
         # Create a new Dorm instance and save it
         dorm = Dorm.objects.get(id=dorm_id)
         
         # dorm.address=address,
-        dorm.guest=guests,
-        dorm.bedroom=bedrooms,
-        dorm.bed=beds,
-        dorm.bathroom=int(bathroomsa),
+        dorm.guest=guestsa
+        dorm.bedroom=bedroomsa
+        dorm.bed=bedsa
+        dorm.bathroom=bathroomsa
         
         
         
 
         # Save selected amenities (assuming a ManyToMany relationship)
         dorm.amenities.set(selected_amenities)
-        RentalCost.objects.create(dorm=dorm,rent=price)
+        RentalCost.objects.create(dorm=dorm,rent=price,deposit=deposit,utilities=utilities)
 
         soup = BeautifulSoup(request.POST.get('map'), 'html.parser')
 
@@ -428,7 +430,7 @@ def removedorm(request,did):
     Dorm.objects.get(id=did).delete()
     return redirect('mylisting')
 
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def submitreview(request):
     if request.method == 'POST':
         review_text = request.POST.get('review_text')
@@ -445,7 +447,7 @@ def submitreview(request):
         return redirect('dorm_detail',request.POST.get('dorm_id'))
     else:
         return redirect('home')
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def profile(request):
     profile = Profile.objects.get(user=request.user)
 
@@ -503,7 +505,7 @@ def profile(request):
         'password_form': password_form
     })
 
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def deactivate_account(request):
     # Ensure the user is authenticated
     if request.user.is_authenticated:
@@ -519,7 +521,7 @@ def deactivate_account(request):
         return redirect('profile')
     
 
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def delete_account(request):
     # Ensure the user is authenticated
     if request.user.is_authenticated:
@@ -534,7 +536,7 @@ def delete_account(request):
         messages.error(request, "You must be logged in to delete your account.")
         return redirect('profile')
 
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def add_to_favorites(request, dorm_id):
     dorm = Dorm.objects.get(id=dorm_id)
 
@@ -545,7 +547,7 @@ def add_to_favorites(request, dorm_id):
     return redirect('home')
 
 # View to remove a dorm from favorites
-@login_required(login_url='/role-selection/')
+@login_required(login_url='/login/')
 def remove_from_favorites(request, dorm_id):
     dorm = Dorm.objects.get(id=dorm_id)
 

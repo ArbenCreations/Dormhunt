@@ -68,9 +68,9 @@ Details | DromHunt
                     <div class="rommPrice fs15 fw-bold font-color-0055FF">
                         ₱ {{ dorm.rentalcost.rent }} / Month
                     </div>
-                    <div>
+                    {% comment %} <div>
                         <i class="far fa-heart font-color-gray-light"></i>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
                 <p class="fs12 fw500 font-color-gray-light p-0 m-0 pt-2">{{ dorm.name }}</p>
                 <div class="rating py-2">
@@ -92,8 +92,8 @@ Details | DromHunt
                         {{ dorm.type_of_dorm }}
                     </div>
                     <div
-                        class="fs12 fw500 {% if dorm.availability_status %} font-color-4CAF50 {% else %} text-danger {% endif %}">
-                        {% if dorm.availability_status %}
+                        class="fs12 fw500 {% if dorm.published %} font-color-4CAF50 {% else %} text-danger {% endif %}">
+                        {% if dorm.published %}
                         Available
                         {% else %}
                         Not Available
@@ -143,27 +143,29 @@ Details | DromHunt
                                 {{ dorm.owner.profile.phone_number }}
                             </div>
                         </div>
-                        {% if request.user.profile.role != 'Owner' %}
+                        {% if dorm.owner.id  == request.user.id  %}
+                        
+                        {% else %}
+                        {% comment %} {% if request.user.profile.role != 'Owner' %} {% endcomment %}
                         <div class="col-xl-6 mt-4 col-12">
-                            <a href="">
-                                <a href="{% url 'messages' %}?chat_id={{ chat_id }}" class="w-100 btn-blue fs12 fw500">
+                            
+                                <a href="{% url 'messages' %}?chat_id={{ chat_id }}" class="d-flex justify-content-center align-items-center w-100 btn btn-blue fs12 fw500">
                                     Book an appointment
                                 </a>
-
-                            </a>
                         </div>
+                        {% comment %} {% endif %} {% endcomment %}
                         {% endif %}
                     </div>
                 </div>
             </div>
-            {% if request.user.profile.role != 'Owner' %}
+            {% if dorm.owner.id  != request.user.id  %}
             <div class="row mt-4">
                 <div class="col-lg-7">
                     <h5 class="fs12 fw600">Reviews:</h5>
 
 
                     {% for review in dorm.reviews.all %}
-                    <div class="p-3 mb-2">
+                    <div class="p-1 mb-2">
                         <p class="mb-1 d-flex gap-2 text-black fs12 fw600">
                             <span>{{ review.reviewer_name }}</span>
                             {{ review.rating |floatformat}} Star
@@ -231,6 +233,7 @@ Details | DromHunt
 
                     {% endif %}
                     {% if dorm.bathroom %}
+                    {% if dorm.bathroom != '0' %}
                     <tr>
                         <td class="text-end font-color-gray-light fw600 fs10">Bathroom:</td>
                         <td class="font-color-gray-light fs10">.........................................................
@@ -238,8 +241,10 @@ Details | DromHunt
                         <td class="fs12 fw500">{{ dorm.bathroom }} Bathroom(s)</td>
                     </tr>
                     {% endif %}
+                    {% endif %}
 
                     {% if dorm.bed %}
+                    {% if dorm.bed != '0' %}
                     <tr>
                         <td class="text-end font-color-gray-light fw600 fs10">Bed:</td>
                         <td class="font-color-gray-light fs10">.........................................................
@@ -247,8 +252,10 @@ Details | DromHunt
                         <td class="fs12 fw500">{{ dorm.bed }} Bed(s)</td>
                     </tr>
                     {% endif %}
+                    {% endif %}
 
                     {% if dorm.bedroom %}
+                    {% if dorm.bedroom != '0' %}
                     <tr>
                         <td class="text-end font-color-gray-light fw600 fs10">Bedroom:</td>
                         <td class="font-color-gray-light fs10">.........................................................
@@ -256,14 +263,18 @@ Details | DromHunt
                         <td class="fs12 fw500">{{ dorm.bedroom }} Bedroom(s)</td>
                     </tr>
                     {% endif %}
+                    {% endif %}
 
                     {% if dorm.study_area %}
+                    {% if dorm.study_area != '0' %}
+
                     <tr>
                         <td class="text-end font-color-gray-light fw600 fs10">Study Area:</td>
                         <td class="font-color-gray-light fs10">.........................................................
                         </td>
                         <td class="fs12 fw500">{{ dorm.study_area }} Table(s)</td>
                     </tr>
+                    {% endif %}
                     {% endif %}
 
                 </tbody>
@@ -296,7 +307,7 @@ Details | DromHunt
                 <iframe class="w-100 h-100" src="{{ dorm.location.google_map_embed_code }}" style="border:0;"
                     allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
-            {% if request.user.profile.role == 'Owner' %}
+            {% if dorm.owner.id  == request.user.id %}
             <div class="fs12 fw500 my-2">
                 <a href='{% url "removedorm" dorm.id  %}' class='btn btn-danger'><i class='fa fa-trash'></i> Remove
                     listing</a>
