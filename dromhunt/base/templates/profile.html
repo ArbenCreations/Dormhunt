@@ -48,12 +48,13 @@ Profile | DromHunt
             </div>
         </div>
         {% if form.profile_pic.errors %}
-        <div class="alert alert-danger mt-2">
+        <div class="alert alert-danger mt-2 errorss" >
             {% for error in form.profile_pic.errors %}
                 <p>{{ error }}</p>
             {% endfor %}
         </div>
     {% endif %}
+
         <!-- Edit Profile Picture Form (Initially Hidden) -->
         <form id="edit-pic-form" method="POST" enctype="multipart/form-data" style="display: none;">
             {% csrf_token %}
@@ -70,7 +71,29 @@ Profile | DromHunt
         </h1>
 
         <p class="fs12 fw500 text-center pb-4">{{ profile.occupation }}</p>
+        {% for message in messages %}
+        
+            <div class="alert alert-danger fs10" id='errorAlert'>
+                {{ message }}
+            </div>
+        
+        {% endfor %}
 
+        <script>
+            // Wait for the document to fully load
+            document.addEventListener("DOMContentLoaded", function() {
+                // Find the alert element
+                var alertElement = document.getElementById('errorAlert');
+        
+                // Check if the element exists
+                if (alertElement) {
+                    // Set a timeout to hide the alert after 5 seconds (5000 milliseconds)
+                    setTimeout(function() {
+                        alertElement.style.display = 'none';
+                    }, 5000);
+                }
+            });
+        </script>
         <!-- Legal Name Section -->
         <div class="w-100 mb-4">
             <div class="d-flex justify-content-between">
@@ -123,13 +146,14 @@ Profile | DromHunt
         </h3>
         <a href="#" class="fs12 fw500 text-decoration-underline" id="edit-password-btn">Update</a>
     </div>
+    
     <p class="fs12 fw500">Change your password</p>
 
     <!-- Hidden Password Change Form -->
     <form id="edit-password-form" method="POST" style="display: none;">
         {% csrf_token %}
         {{ password_form.as_p }}  <!-- This will render the password change fields -->
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" name='update_password' class="btn btn-primary">Save</button>
     </form>
 </div>
         <!-- ID Document Section -->
@@ -145,7 +169,7 @@ Profile | DromHunt
                 <input type="text" name="id_document_type" value="{{ profile.id_document_type }}" class="form-control">
 
                 {% comment %} {{ form.id_document_type }} {% endcomment %}
-                <button type="submit" name="update_profile" class="btn btn-primary">Save Changes</button>
+                <button type="submit" name="update_doc" class="btn btn-primary">Save Changes</button>
             </form>
         </div>
 
@@ -158,12 +182,12 @@ Profile | DromHunt
 
       <!-- Deactivate Account -->
 <div class="w-100 mb-2">
-    <a href="#" class="fs16 font-color-0055FF fw500" id="deactivate-account-btn">Deactivate account</a>
+    <a href="{% url "deactivate_account" %}" class="fs16 font-color-0055FF fw500" id="deactivate-account-btn">Deactivate account</a>
 </div>
 
 <!-- Delete Account -->
 <div class="w-100">
-    <a href="#" class="fs16 font-color-0055FF fw500" id="delete-account-btn">Delete account</a>
+    <a href="{% url "delete_account" %}" class="fs16 font-color-0055FF fw500" id="delete-account-btn">Delete account</a>
 </div>
 
 <!-- Deactivation/Deletion Confirmation Modal -->
@@ -171,7 +195,7 @@ Profile | DromHunt
     <div class="modal-content">
         <p class='fs15 lh-sm fw500'>Are you sure you want to deactivate or delete your account? This action is irreversible.</p>
         <button id="confirm-deactivate" class="btn btn-danger">Deactivate</button>
-        <button id="confirm-delete" class="btn btn-danger">Delete</button>
+        <button id="confirm-delete" onclick='udelete()' class="btn btn-danger">Delete</button>
         <button id="cancel-action" class="btn btn-secondary">Cancel</button>
     </div>
 </div>
@@ -218,17 +242,18 @@ Profile | DromHunt
         modal.style.display = "flex";
 
         document.getElementById("confirm-deactivate").onclick = function() {
+            
             window.location.href = `{% url 'deactivate_account' %}`;
-        };
-
-        document.getElementById("confirm-delete").onclick = function() {
-            window.location.href = `{% url 'delete_account' %}`;
         };
 
         document.getElementById("cancel-action").onclick = function() {
             modal.style.display = "none";
         };
     }
+    function udelete(){
+        window.location.href = `{% url 'delete_account' %}`;
+    }
+
     document.getElementById("edit-name-btn").addEventListener("click", function(event) {
         event.preventDefault();
         toggleEditForm("edit-name-form", "legal-name");

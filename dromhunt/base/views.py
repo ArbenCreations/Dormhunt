@@ -317,10 +317,14 @@ def dorm_filter_view(request):
     })
 
 
+@login_required(login_url='/login/')
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
         return redirect('home')
+    else:
+        return redirect('home')
+        
 
 
 @login_required(login_url='/login/')
@@ -455,7 +459,7 @@ def profile(request):
         # Handle the profile update
         if 'update_profile' in request.POST:
             form = ProfileForm(request.POST, instance=profile)
-            print(form)
+            # print(form)
             if form.is_valid():
                 form.save()
                 return redirect('profile')  # Redirect to the same profile page after saving
@@ -471,10 +475,16 @@ def profile(request):
         # Handle the password update
         if 'update_password' in request.POST:
             password_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+            print(password_form)
             if password_form.is_valid():
                 user = password_form.save()
+                messages.success(request, 'Password Updated')
+
                 update_session_auth_hash(request, user)  # Keep the user logged in after password change
-                return redirect('profile')  # Redirect to the profile page
+                return redirect('profile')
+            else:
+                messages.error(request, password_form.errors)
+                # Redirect to the profile page
         if 'update_pic' in request.POST:
             # Handle the profile picture update
             profile.profile_pic=request.FILES['profile_pic']
