@@ -80,7 +80,7 @@ def chat_messages(request, chat_id):
 
     # Return the messages in JSON format
     return JsonResponse({'messages': message_data})
-
+    # return render(request, 'message.html', message_data)
 def success_view(request):
     return render(request,'success.html')
 
@@ -88,8 +88,11 @@ def success_view(request):
 
 @login_required(login_url='/login/')
 def Chatmessages(request):
-    dorms = Dorm.objects.all()
+    chat_id = request.GET.get('chat_id')
 
+    dorms = Dorm.objects.all()
+    chatd = Chat.objects.get(id=chat_id)
+    # print(chatd.user.id)
     # Retrieve chats where the current user is either the sender or the recipient.
     chats = Chat.objects.filter(
         Q(user=request.user) | Q(message__sender=request.user)
@@ -99,7 +102,6 @@ def Chatmessages(request):
     messages = []
 
     # Fetch the specific chat based on chat_id from the URL, if available
-    chat_id = request.GET.get('chat_id')
     if chat_id:
         chat = get_object_or_404(Chat, id=chat_id)
 
@@ -109,13 +111,14 @@ def Chatmessages(request):
 
     # Prepare the data for rendering
     for chat in chats:
-      
-       if(chat.user.username!=request.user.username):
+    
+        if(chat.user.username!=request.user.username):
             last_message = Message.objects.filter(chat=chat).order_by('timestamp').last()
             profile = Profile.objects.get(user=chat.user)
 
             chat_data.append({
                 'chat': chat,
+                
                 'last_message': last_message,
                 'chat_user': chat.user.username,
                 'chat_id': chat.id,
@@ -124,6 +127,7 @@ def Chatmessages(request):
 
     return render(request, 'message.html', {
         'dorms': dorms,
+        'chatd':chatd,
         'chat_data': chat_data,
         'messages': messages,
     })

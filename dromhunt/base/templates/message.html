@@ -43,6 +43,7 @@
                 <div class="offcanvas-body">
                     <div class="Users pt-5 pe-4">
                         <div class="offcanvas-header">
+                            
                             <h3 class="fs20 fw600 pt-xl-5">Messages</h3>
                             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
                                 aria-label="Close"></button>
@@ -83,8 +84,8 @@
                 role="button" aria-controls="offcanvasExample">
                 All Messages
             </a>
-
-            <h3 class="fs14 fw600">{{ chat_user.username }}</h3>
+           
+            <h3 class="fs14 fw600">{{chatd.user.username }}</h3>
             <div class="messageSection mt-xl-5 pt-5" id="messageSection">
                 {% for message in messages %}
                 <div class="{% if message.sender == request.user.username %}sender{% else %}recive{% endif %}">
