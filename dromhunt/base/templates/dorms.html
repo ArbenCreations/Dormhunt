@@ -9,7 +9,11 @@ DromHunt
 <div class="container main-wrapper">
 
     <section class="recommendations">
-        <h2 class="fs18 fw500">Filters</h2>
+        <div class='d-flex justify-content-between align-content-center'>
+            <h2 class="fs18 fw500">Filters</h2>
+
+            <a href='{% url "dorm_filter_view" %}' class='fs12 fw500'>Clear All</a>
+        </div>
 
         <div class='d-flex gap-4 pt-4 pb-5'>
             <a href='{% url "dorm_filter" %}' class='btn text-dark fw600 fs12 btn-outline-primary d-flex align-items-center gap-2'>

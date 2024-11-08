@@ -167,7 +167,7 @@ Details | DromHunt
                     {% for review in dorm.reviews.all %}
                     <div class="p-1 mb-2">
                         <p class="mb-1 d-flex gap-2 text-black fs12 fw600">
-                            <span>{{ review.reviewer_name }}</span>
+                            <span>{{ review.reviewer_name.profile.legal_name }}</span>
                             {{ review.rating |floatformat}} Star
                             <span class="text-warning">
                                 {% for i in 5|range_filter %}

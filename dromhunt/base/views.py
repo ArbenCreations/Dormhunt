@@ -259,24 +259,33 @@ def dorm_filter(request):
 
 def dorm_filter_view(request):
     # Get filter values from GET request (or set defaults)
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
+    max_priceD = RentalCost.objects.aggregate(Max('rent'))['rent__max']
+    min_price = request.GET.get('min_price', '0')  # Set a default minimum price of 0
+    max_price = request.GET.get('max_price', max_priceD)  # Set a reasonable default max price
+
     bath_count = request.GET.get('bath_count', None)
     dorm_types = request.GET.getlist('dorm_types', [])
     amenities = request.GET.getlist('amenities', [])
     accessibility_features = request.GET.getlist('accessibility_feature', [])
-    amenitiess=Amenity.objects.all()
-    # Convert prices to decimals
-    min_price = float(min_price)
 
+    amenitiess = Amenity.objects.all()
 
-    max_price = float(max_price)
+    # Convert prices to float if they are provided, with fallback to defaults
+    try:
+        min_price = float(min_price)
+    except (TypeError, ValueError):
+        min_price = 0  # Default fallback
+
+    try:
+        max_price = float(max_price)
+    except (TypeError, ValueError):
+        max_price = 10000  # Default fallback
 
     # Start with the base queryset
     dorms = Dorm.objects.all()
+
     # Filter by price range
     dorms = dorms.filter(rentalcost__rent__gte=min_price, rentalcost__rent__lte=max_price)
-    # print(dorms)
 
     # Filter by number of bathrooms (if selected)
     if bath_count:
@@ -297,8 +306,10 @@ def dorm_filter_view(request):
     # Get all possible filter choices
     amenity_list = Amenity.objects.all()
     accessibility_feature_list = AccessibilityFeature.objects.all()
+
     user_favorites = request.user.favoritedorm_set.all() if request.user.is_authenticated else []
     user_favorites_ids = user_favorites.values_list('dorm', flat=True) if request.user.is_authenticated else []
+
     # Return the filtered results along with filter options
     return render(request, 'dorms.html', {
         'dorms': dorms,
@@ -310,10 +321,9 @@ def dorm_filter_view(request):
         'max_price': max_price,
         'bath_count': bath_count,
         'dorm_types': dorm_types,
-        'amenitiess':amenitiess,
-        'user_favorites':user_favorites,
-        'user_favorites_ids':user_favorites_ids
-        # 'dorm_type': ['single','double',],
+        'amenitiess': amenitiess,
+        'user_favorites': user_favorites,
+        'user_favorites_ids': user_favorites_ids,
     })
 
 
