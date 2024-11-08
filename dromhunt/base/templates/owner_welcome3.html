@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listing Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css'
+        integrity='sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=='
+        crossorigin='anonymous' />
+
+
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+
+<body>
+
+    <div class="main-wrapper py-5 container">
+        <div class="col-xl-5 ">
+            <h2 class="mb-3 fs25 font-color-0055FF">Review your listing</h2>
+            <p class="fs15 fw500 lh-sm">To ensure your listing is appealing to potential guests, review it carefully for
+                accuracy, attractive visuals, clear descriptions, easy communication, and positive reviews.</p>
+        </div>
+        <div class="row py-5 gap-5">
+            <div class="col-xl-6 col-12">
+                <div class="owl-carousel owl-theme position-relative">
+                    {% for image in dorm.images.all %}
+                    <div class="item">
+                        <img src="{{ image.image.url }}" alt="">
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="card-body w-100 px-0">
+                    <div class=" justify-content-between">
+                        <div class=" fs20 fw400 ">
+                            {{ dorm.type_of_dorm }}
+                        </div>
+                        <div class="rommPrice fs15 fw600">
+                            ₱ {{ dorm.rentalcost.rent }}
+                        </div>
+                    </div>
+                    <hr class="my-3 mb-4">
+                    <div class="d-flex  col-xl-8 col-12 align-items-center gap-2">
+                        <div class="col-xl-10">
+
+                            <label class="fw16 fw600" for="matchmate">List your place on Matchmate!</label>
+                            <p class="fs10 fw500 mt-1">When listing your place on Matchmate, users can find compatible
+                                roommates easily by matching preferences and interests, ensuring a harmonious living
+                                experience for all.</p>
+
+                        </div>
+                        <div class="">
+                            <input type="checkbox" class="" id="matchmate">
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-lg-5 col-12">
+                <!-- Description -->
+                <h5 class="fs15 fw600">Description</h5>
+                <p class="fs10 fw500">{{ dorm.description }}</p>
+
+                <!-- Unit Details -->
+                <h5>Unit Details</h5>
+                <table class="table table-borderless">
+                    <tbody>
+                        {% if dorm.area %}
+                        <tr>
+                            <td class="text-end font-color-gray-light fw600 fs10">Area:</td>
+                            <td class="font-color-gray-light fs10">
+                                .........................................................</td>
+                            <td class="fs12 fw500">{{ dorm.area |floatformat }} sq ft</td>
+                        </tr>
+                        {% endif %}
+
+                        {% if dorm.type_of_dorm %}
+                        <tr>
+                            <td class="text-end font-color-gray-light fw600 fs10">Type of Dorm:</td>
+                            <td class="font-color-gray-light fs10">
+                                .........................................................</td>
+                            <td class="fs12 fw500">{{ dorm.type_of_dorm }}</td>
+                        </tr>
+
+                        {% endif %}
+                        {% if dorm.bathroom %}
+                        <tr>
+                            <td class="text-end font-color-gray-light fw600 fs10">Bathroom:</td>
+                            <td class="font-color-gray-light fs10">
+                                .........................................................</td>
+                            <td class="fs12 fw500">{{ dorm.bathroom }} Bathroom(s)</td>
+                        </tr>
+                        {% endif %}
+
+                        {% if dorm.bed %}
+                        <tr>
+                            <td class="text-end font-color-gray-light fw600 fs10">Bed:</td>
+                            <td class="font-color-gray-light fs10">
+                                .........................................................</td>
+                            <td class="fs12 fw500">{{ dorm.bed }} Bed(s)</td>
+                        </tr>
+                        {% endif %}
+
+                        {% if dorm.bedroom %}
+                        <tr>
+                            <td class="text-end font-color-gray-light fw600 fs10">Bedroom:</td>
+                            <td class="font-color-gray-light fs10">
+                                .........................................................</td>
+                            <td class="fs12 fw500">{{ dorm.bedroom }} Bedroom(s)</td>
+                        </tr>
+                        {% endif %}
+
+                        {% if dorm.study_area %}
+                        <tr>
+                            <td class="text-end font-color-gray-light fw600 fs10">Study Area:</td>
+                            <td class="font-color-gray-light fs10">
+                                .........................................................</td>
+                            <td class="fs12 fw500">{{ dorm.study_area }} Table(s)</td>
+                        </tr>
+                        {% endif %}
+
+                    </tbody>
+                </table>
+
+                <!-- Rental Costs -->
+                <h5>Rental Costs</h5>
+                <table class="table table-borderless w-100">
+                    <tbody>
+                        <tr>
+                            <td class="text-start font-color-gray-light fw600 fs10">Rent:</td>
+                            <td class="fs12 fw500 text-end">₱ {{ dorm.rentalcost.rent |floatformat }} / month</td>
+                        </tr>
+                        <tr>
+                            <td class="text-start font-color-gray-light fw600 fs10">Deposit:</td>
+                            <td class="fs12 fw500 text-end">₱ {{ dorm.rentalcost.deposit |floatformat }} Deposit</td>
+                        </tr>
+                        <tr>
+                            <td class="text-start font-color-gray-light fw600 fs10">Utilities:</td>
+                            <td class="fs12 fw500 text-end">₱ {{ dorm.rentalcost.utilities |floatformat }} / month</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Location -->
+                <h5>Location</h5>
+                <p class="font-color-gray-light fs10 fw500">{{ dorm.location.address }}</p>
+
+
+            </div>
+        </div>
+
+        <div class="col-xl-3 mx-auto col-12">
+            <form action="{% url 'dorm_create_part_3' dorm_id %}" method="post">
+                {% csrf_token %}
+                <input type='submit' class="btn btn-primary w-100 fs10 py-2 mt-4" name='pub' value='Publish'>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        let imageCounter = 1;
+
+        function loadImage(event, targetId) {
+            const file = event.target.files[0];
+            console.log(targetId);
+            console.log(event);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById(targetId).style.backgroundImage = `url('${e.target.result}')`;
+                    document.getElementById(targetId).style.backgroundSize = 'cover';
+                    document.getElementById(targetId).style.backgroundPosition = 'center';
+                    document.getElementById(targetId).innerHTML = '';
+                };
+                reader.readAsDataURL(file);
+            }
+            if (targetId != 'coverImage') {
+                addMoreImageFields();
+            }
+
+        }
+
+        function addMoreImageFields() {
+            imageCounter++;
+            const newImageDiv = document.createElement('div');
+            newImageDiv.classList.add('col-md-4');
+            newImageDiv.innerHTML = `
+            <div class="image-upload" onclick="document.getElementById('additionalImage${imageCounter}').click();">
+            <input type="file" id="additionalImage${imageCounter}" class=" d-none" accept="image/*" onchange="loadImage(event, 'imageDisplay${imageCounter}')">
+            <div  id="imageDisplay${imageCounter}" class="backIMGS text-muted">Add more</div>
+            </div>`;
+            document.getElementById('imageUploadContainer').appendChild(newImageDiv);
+        }
+
+
+        function increment(id) {
+            const valueElement = document.getElementById(id);
+            let value = parseInt(valueElement.textContent);
+            valueElement.textContent = ++value;
+        }
+
+        function decrement(id) {
+            const valueElement = document.getElementById(id);
+            let value = parseInt(valueElement.textContent);
+            if (value > 0) {
+                valueElement.textContent = --value;
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'
+        integrity='sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=='
+        crossorigin='anonymous'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js'
+        integrity='sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw=='
+        crossorigin='anonymous'></script>
+
+    <script>
+        $('.owl-carousel').owlCarousel({
+            loop: true,
+            margin: 10,
+            nav: false,
+            dots: true,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                600: {
+                    items: 1
+                },
+                1000: {
+                    items: 2
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

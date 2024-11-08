@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+
+<body>
+    <div class='container pt-4'>
+        <a href='{% url "home" %}'>
+            <img src="{% static 'assets/media/Logo/dormhunt-blue-bg-white_2-removebg-preview 1.svg' %}" alt="">
+        </a>
+    </div>
+    <form action="{% url 'dorm_create' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container py-4">
+            
+            <h2 class="mb-4 fs28 font-color-0055FF">Welcome!</h2>
+            <p class="fs15 fw500">Create your listings with DormHunt</p>
+    
+            <!-- Image Upload Section -->
+            <h3 class="fs28 font-color-0055FF mt-4">Choose the best shots</h3>
+            <p class="fs15 fw500">Selecting photos for your listing.</p>
+    
+            <div class="row">
+                <div class="row g-3 col-xl-6 h-100" id="imageUploadContainer">
+                    <!-- Cover Image -->
+                    <div class="col-md-6">
+                        <div class="image-upload cover" onclick="document.getElementById('coverInput').click()">
+                            <input type="file" id="coverInput" name="cover_image" class="d-none" accept="image/*" onchange="loadImage(event, 'coverImage')">
+                            <div id="coverImage" class="backIMGS text-muted"><span class="textCover">Cover</span></div>
+                        </div>
+                    </div>
+                    <!-- Add Image Placeholder -->
+                    <div class="col-md-6">
+                        <div class="image-upload" onclick="document.getElementById('addImageInput').click();">
+                            <input type="file" id="addImageInput" name="additional_image" class="d-none" accept="image/*" onchange="loadImage(event, 'additionalImage')">
+                            <div id="additionalImage" class="backIMGS text-muted">Add more</div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Listing Title and Description -->
+                <div class="row mt-4 col-xl-6 h-100">
+                    <div class="col-md-12 h-100">
+                        <label for="title" class="fs18 fw600 font-color-0055FF">Stand out and get booking</label>
+                        <p class="fs12 fw500">Make your short title to attract guests.</p>
+                        <input type="text" id="title" name="title" class="inp w-100" maxlength="30" placeholder="30 characters available">
+                        <p class="fs10 fw500 py-2">30 characters available</p>
+                    </div>
+                    <div class="col-md-12 h-100">
+                        <label for="description" class="fs18 fw600 font-color-0055FF">Write your listing description</label>
+                        <p class="fs12 fw500">Share the charm of your place with a friendly description.</p>
+                        <textarea id="description" name="description" class="inp w-100" maxlength="250" rows="3" placeholder=""></textarea>
+                        <p class="fs10 fw500 py-2">250 characters available</p>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Type of Place Section -->
+            <h3 class="fs28 font-color-0055FF mt-4">Set up your listing!</h3>
+            <p class="fs15 fw500">Make your dorm the next home sweet home</p>
+            <h4 class="fs20 fw600 text-center">Type of place</h4>
+            <div class="d-flex col-xl-4 flex-wrap justify-content-center mx-auto gap-2">
+                {% for option, display in dormTypes %}
+                <div class="wm100 placeBTNS">
+                    <label class="radio-card">
+                        <input type="radio" id="type_of_place_{{ forloop.counter }}" name="type_of_dorm" value="{{ option }}" class="d-none">
+                        <div class="card text-center">
+                            <div>
+                                <img src="{% static 'assets/media/Logo/home 1.png' %}" alt="">
+                            </div>
+                            <h5>{{ display }}</h5>
+                            <small>(3-5 people)</small>
+                        </div>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+    
+            <h4 class="fs16 fw600 text-center pt-5 pb-4">What type of place will guests have?</h4>
+            <div class="d-flex col-xl-3 flex-wrap justify-content-center mx-auto gap-3">
+                {% for option, display in placeTypes %}
+                <div class="wm100 placeBTNS bt2">
+                    <label class="radio-card">
+                        <input type="radio" id="place_type_{{ forloop.counter }}" name="place_type" value="{{ option }}" class="d-none">
+                        <div class="card gap-3">
+                            <div>
+                                <img src="{% static 'assets/media/Logo/single room.png' %}" alt="">
+                            </div>
+                            <div>
+                                <h5>{{ display }}</h5>
+                                <p class="lh-sm p-0 m-0">{{ option }}</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+    
+            <!-- Matchmate Option -->
+            <div class="d-flex mt-5 col-xl-3 col-12 mx-auto align-items-center gap-2">
+                <div class="col-xl-10">
+                    <label class="fw16 fw600" for="matchmate">List your place on Matchmate!</label>
+                    <p class="fs10 fw500 mt-1">When listing your place on Matchmate, users can find compatible roommates easily by matching preferences and interests, ensuring a harmonious living experience for all.</p>
+                </div>
+                <div>
+                    <input type="checkbox" id="matchmate" name="matchmate">
+                </div>
+            </div>
+    
+            <!-- Next Button -->
+            <div class="col-xl-3 mx-auto col-12">
+                <button type="submit" class="btn btn-primary w-100 fs10 py-2 mt-4">Next</button>
+            </div>
+        </div>
+    </form>
+    
+
+    <script>
+        let imageCounter = 1;
+
+        function loadImage(event, targetId) {
+            const file = event.target.files[0];
+            console.log(targetId);
+            console.log(event);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(targetId).style.backgroundImage = `url('${e.target.result}')`;
+                    document.getElementById(targetId).style.backgroundSize = 'cover';
+                    document.getElementById(targetId).style.backgroundPosition = 'center';
+                    document.getElementById(targetId).innerHTML = '';
+                };
+                reader.readAsDataURL(file);
+            }
+            if (targetId != 'coverImage') {
+                addMoreImageFields();
+            }
+
+        }
+
+        function addMoreImageFields() {
+            imageCounter++;
+            const newImageDiv = document.createElement('div');
+            newImageDiv.classList.add('col-md-4');
+            newImageDiv.innerHTML = `
+            <div class="image-upload" onclick="document.getElementById('additionalImage${imageCounter}').click();">
+            <input type="file" id="additionalImage${imageCounter}" class=" d-none" accept="image/*" onchange="loadImage(event, 'imageDisplay${imageCounter}')">
+            <div  id="imageDisplay${imageCounter}" class="backIMGS text-muted">Add more</div>
+            </div>`;
+            document.getElementById('imageUploadContainer').appendChild(newImageDiv);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

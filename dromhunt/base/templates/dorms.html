@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+
+DromHunt
+{% endblock title %}
+
+{% block content %}
+<div class="container main-wrapper">
+
+    <section class="recommendations">
+        <h2 class="fs18 fw500">Filters</h2>
+
+        <div class='d-flex gap-4 pt-4 pb-5'>
+            <a href='{% url "dorm_filter" %}' class='btn text-dark fw600 fs12 btn-outline-primary d-flex align-items-center gap-2'>
+                <img src="{% static 'assets/media/Logo/page_info.svg' %}" alt="">
+                All Filters
+            </a>
+                        <!-- Display dorm types dynamically -->
+                {% for dorm_type in dorm_types %}
+                <div class='btn text-dark fw600 fs12 btn-outline-primary d-flex align-items-center gap-2'>
+                    {{ dorm_type }}
+                </div>
+            {% endfor %}
+
+            <!-- Display bath count -->
+            {% if bath_count %}
+                <div class='btn text-dark fw600 fs12 btn-outline-primary d-flex align-items-center gap-2'>
+                    {{ bath_count }} bath
+                </div>
+            {% endif %}
+
+            <!-- Display price range -->
+            <div class='btn text-dark fw600 fs12 btn-outline-primary d-flex align-items-center gap-2'>
+                Price range: {{ min_price }} - {{ max_price }}
+            </div>
+
+            <!-- Display amenities dynamically -->
+            <div class='d-flex flex-wrap'>
+                {% for amenity in amenities %}
+                    {% for amf in amenitiesF %}
+                    {% if amf|add:"0" == amenity.id|add:"0" %}
+                    <div class='btn text-dark fw600 fs12 btn-outline-primary d-flex align-items-center gap-2'>
+                        {{ amenity.name }}
+                    </div>
+                    {% endif %}
+
+                {% endfor %}
+                {% endfor %}
+            </div>
+
+            <!-- Display accessibility features dynamically -->
+            <div class='d-flex flex-wrap'>
+                {% for feature in accessibility_features %}
+                    {% for aff in accessibility_featuresF %}
+                        {% if aff|add:"0" == feature.id|add:"0" %}
+                        <div class='btn text-dark fw600 fs12 btn-outline-primary d-flex align-items-center gap-2'>
+                            {{ feature.name }}
+                        </div>
+                        
+                        {% endif %}
+                        
+                    {% endfor %}
+                
+                {% endfor %}
+            </div>
+        </div>
+        <div class="Dromcards d-flex justify-content-xl-start justify-content-center gap-2 flex-wrap">
+            {% if dorms %}
+            
+            {% for dorm in dorms %}
+            <div class="card border-0 col-xl-4 wm100">
+                <a href="{% url "dorm_detail" dorm.id %}">
+                <div class="card-img w-100">
+                    {% if dorm.images.all %}
+                        <img class="w-100" src="{{ dorm.images.first.image.url }}" alt="">
+                    {% else %}
+                        <img class="w-100" src="{% static 'assets/media/default-dorm-image.png' %}" alt="Dorm Image">
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="roomPrice fs15 fw-bold font-color-0055FF">
+                            ₱ {{ dorm.rentalcost.rent }} / Month
+                        </div>
+                        <div>
+                            {% if request.user.is_authenticated %}
+                                {% if dorm.id in user_favorites_ids %}
+                                    <!-- If the dorm is already favorited, show remove button -->
+                                    <a href="{% url 'remove_from_favorites' dorm.id %}">
+                                        <i class="fas fa-heart text-danger"></i>
+                                    </a>
+                                {% else %}
+                                    <!-- If the dorm is not favorited, show add button -->
+                                    <a href="{% url 'add_to_favorites' dorm.id %}">
+                                        <i class="far fa-heart font-color-gray-light"></i>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <i class="far fa-heart font-color-gray-light"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="fs12 fw500 font-color-gray-light p-0 m-0">{{ dorm.name }}</p>
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="bed-icon">
+                            <img src="{% static 'assets/media/Logo/bed.svg' %}" alt="">
+                        </div>
+                        <div class="fs12 fw500 font-color-gray-light">
+                            {{ dorm.type_of_dorm }}
+                        </div>
+                    </div>
+                </div>
+            </a>
+            </div>
+        
+    {% endfor %}
+            {% else %}
+
+            No results
+            {% endif %}
+        </div>
+    </section>
+
+</div>
+
+
+{% endblock content %}
+

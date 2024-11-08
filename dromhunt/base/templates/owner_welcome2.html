@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listing Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+
+<body>
+
+    <form action="{% url 'dorm_create_part_2' dorm_id %}" method="post">
+        {% csrf_token %}
+    <div class="container py-5">
+
+        <!-- Location Section -->
+        <div class="col-xl-3">
+            <h2 class="mb-4 fs28 font-color-0055FF">Set up your location</h2>
+            <p class="fs12 fw500 lh-sm">
+                When uploading your listing address, remember to double-check for accuracy to ensure potential guests can find your place easily and without any confusion.
+            </p>
+        </div>
+    
+        <div class="d-flex flex-wrap form2 py-5 gap-4">
+            
+            <div class="inpbox mb-xl-4">
+                <label for="street_address" class="fs10 fw400">Street Address</label>
+                <input type="text" name="street_address" id="street_address">
+            </div>
+            <div class="inpbox mb-xl-4">
+                <label for="city" class="fs10 fw400">City</label>
+                <input type="text" name="city" id="city">
+            </div>
+            <div class="inpbox mb-xl-4">
+                <label for="state" class="fs10 fw400">State/Province</label>
+                <input type="text" name="state" id="state">
+            </div>
+            <div class="inpbox mb-xl-4">
+                <label for="zip_code" class="fs10 fw400">ZIP/Postal Code</label>
+                <input type="text" name="zip_code" id="zip_code">
+            </div>
+            <div class="inpbox mb-xl-4">
+                <label for="country" class="fs10 fw400">Country</label>
+                <input type="text" name="country" id="country">
+            </div>
+            <div class="inpbox mb-xl-4">
+                <label for="map" class="fs10 fw400">Map Code</label>
+                <input type="text" name="map" id="map">
+            </div>
+        </div>
+    
+        <!-- Details About the Place -->
+        <div class="col-xl-8 justify-content-between gap-5 mx-auto d-flex">
+            <div class="col-xl-6">
+                <h3 class="fs20 font-color-0055FF mt-4">Share more details about your place</h3>
+                <p class="fs12 fw500">Add the basic information, like bed types. You’ll add more details later.</p>
+    
+                <div class="w-100 py-5 counter-container">
+                    <div class="counter-row">
+                        <span class="counter-label">Guests</span>
+                        <div class="counter-controls">
+                            <span class="counter-btn" onclick="decrement('guests')">−</span>
+                            <span id="guests" class="counter-value">0</span>
+                            <input type="hidden" name="guests" id="guests-input" value="0">
+                            <span class="counter-btn" onclick="increment('guests')">+</span>
+                        </div>
+                    </div>
+                
+                    <div class="counter-row">
+                        <span class="counter-label">Bedrooms</span>
+                        <div class="counter-controls">
+                            <span class="counter-btn" onclick="decrement('bedrooms')">−</span>
+                            <span id="bedrooms" class="counter-value">0</span>
+                            <input type="hidden" name="bedrooms" id="bedrooms-input" value="0">
+                            <span class="counter-btn" onclick="increment('bedrooms')">+</span>
+                        </div>
+                    </div>
+                
+                    <div class="counter-row">
+                        <span class="counter-label">Beds</span>
+                        <div class="counter-controls">
+                            <span class="counter-btn" onclick="decrement('beds')">−</span>
+                            <span id="beds" class="counter-value">0</span>
+                            <input type="hidden" name="beds" id="beds-input" value="0">
+                            <span class="counter-btn" onclick="increment('beds')">+</span>
+                        </div>
+                    </div>
+                
+                    <div class="counter-row">
+                        <span class="counter-label">Bathrooms</span>
+                        <div class="counter-controls">
+                            <span class="counter-btn" onclick="decrement('bathrooms')">−</span>
+                            <span id="bathrooms" class="counter-value">0</span>
+                            <input type="hidden" name="bathrooms" id="bathrooms-input" value="0">
+                            <span class="counter-btn" onclick="increment('bathrooms')">+</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+    
+            <!-- Amenities Section -->
+            <div class="col-xl-6">
+                <h3 class="fs20 font-color-0055FF mt-4">Amenities</h3>
+                <p class="fs12 fw500">Add amenities for your guests.</p>
+                <div class="d-flex col-xl-12 flex-wrap justify-content-start mx-auto gap-3">
+                    <!-- Reusable amenity item -->
+                    {% for amenity in amenities %}
+                    <div class="wm100 placeBTNS bt2 bt3">
+                        <label class="radio-card" for="{{ amenity.name }}">
+                            <input type="checkbox" name="Amenities" id='{{ amenity.name }}' value="{{ amenity.id }}" class="d-none">
+                            <div class="card gap-3">
+                                <div>
+                                    <img src="{% static '{{ amenity.icon_url }}' %}" >
+                                </div>
+                                <div>
+                                    <h5>{{ amenity.name }}</h5>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    
+        <!-- Pricing Section -->
+        <div class="col-xl-3 mx-auto col-12">
+            <h4 class="fs16 fw600 pt-5 font-color-0055FF">Set your price</h4>
+            <p class="fs12 fw500">Set your price according to your preference.</p>
+            <div class="rent col-xl-8 justify-content-center mx-auto">
+                <span>₱</span>
+                <input type="text" name="price" placeholder="">
+            </div>
+            <p class="fs12 fw600 text-center py-3">monthly</p>
+        </div>
+    
+        <!-- Next Button -->
+        <div class="col-xl-3 mx-auto col-12">
+            <button type="submit" class="btn btn-primary w-100 fs10 py-2 mt-4">Next</button>
+        </div>
+    </div>
+</form>
+
+
+    <script>
+        let imageCounter = 1;
+
+        function loadImage(event, targetId) {
+            const file = event.target.files[0];
+            console.log(targetId);
+            console.log(event);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(targetId).style.backgroundImage = `url('${e.target.result}')`;
+                    document.getElementById(targetId).style.backgroundSize = 'cover';
+                    document.getElementById(targetId).style.backgroundPosition = 'center';
+                    document.getElementById(targetId).innerHTML = '';
+                };
+                reader.readAsDataURL(file);
+            }
+            if (targetId != 'coverImage') {
+                addMoreImageFields();
+            }
+
+        }
+
+        function addMoreImageFields() {
+            imageCounter++;
+            const newImageDiv = document.createElement('div');
+            newImageDiv.classList.add('col-md-4');
+            newImageDiv.innerHTML = `
+            <div class="image-upload" onclick="document.getElementById('additionalImage${imageCounter}').click();">
+            <input type="file" id="additionalImage${imageCounter}" class=" d-none" accept="image/*" onchange="loadImage(event, 'imageDisplay${imageCounter}')">
+            <div  id="imageDisplay${imageCounter}" class="backIMGS text-muted">Add more</div>
+            </div>`;
+            document.getElementById('imageUploadContainer').appendChild(newImageDiv);
+        }
+
+
+        function increment(id) {
+            const valueElement = document.getElementById(id);
+            const inputElement = document.getElementById(`${id}-input`);
+            let value = parseInt(valueElement.textContent);
+            valueElement.textContent = ++value;
+            inputElement.value = value;  // Update hidden input value
+        }
+        
+        function decrement(id) {
+            const valueElement = document.getElementById(id);
+            const inputElement = document.getElementById(`${id}-input`);
+            let value = parseInt(valueElement.textContent);
+            if (value > 0) {
+                valueElement.textContent = --value;
+                inputElement.value = value;  // Update hidden input value
+            }
+        }
+        
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

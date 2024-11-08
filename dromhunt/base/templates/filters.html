@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Filter
+{% endblock title %}
+
+{% block content %}
+<form method="GET" action="{% url 'dorm_filter_view' %}">
+    <div class="container main-wrapper filter">
+        <div class="d-flex align-items-center py-4 justify-content-between flex-xl-nowrap flex-wrap">
+            <div class="fs18 fw600">Filter</div>
+            <div class="fs12 fw500">
+                <button type="submit" class='btn btn-blue'>Apply Filters</button>
+            </div>
+        </div>
+
+        <!-- Price Range -->
+        <div class="py-4 col-xl-10 mx-auto">
+            <div class="section d-flex gap-4 flex-xl-nowrap flex-wrap">
+                <div>
+                    <h3>Price Range</h3>
+                    <p class="fs10 fw400">The average price per month is ₱2,500</p>
+                </div>
+                <div class="price-range gap-3 flex-xl-nowrap flex-wrap">
+                    <div class="position-relative">
+                        <label for="min_price">Min price</label>
+                        <input type="text" name="min_price" id="min_price" class="price-input" placeholder="Min" value="0">
+                    </div>
+                    <span>-</span>
+                    <div class="position-relative">
+                        <label for="max_price">Max price</label>
+                        <input type="text" name="max_price" id="max_price" class="price-input" placeholder="Max" value="{{max_price}}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bath Count -->
+            <div class="row py-4">
+                <div class="col-xl-6">
+                    <div class="section">
+                        <h3>Bath</h3>
+                        <div class="bath gap-2">
+                            <div class="option">
+                                <input type="radio" id="bath_any" name="bath_count" value="any" {% if bath_count == 'any' %}checked{% endif %}>
+                                <label for="bath_any">Any</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="bath_1" name="bath_count" value="1" {% if bath_count == '1' %}checked{% endif %}>
+                                <label for="bath_1">1</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="bath_2" name="bath_count" value="2" {% if bath_count == '2' %}checked{% endif %}>
+                                <label for="bath_2">2</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="bath_3" name="bath_count" value="3" {% if bath_count == '3' %}checked{% endif %}>
+                                <label for="bath_3">3</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type of Place -->
+                    <div class="section py-4">
+                        <h3>Type of Place</h3>
+                        
+
+                        <div class="typechk d-flex col-xl-8 gap-4 flex-wrap">
+                            <div class="option align-items-center gap-2">
+                                <div class="mychk h-100">
+                                    <input type="checkbox" id="single_room" name="dorm_types" value="Single Room">
+                                    <label for="single_room"></label>
+                                </div>
+                                <div class="h-100">
+                                    <label for="single_room" class="fs12 fw500">Single Room</label>
+                                    <p class="m-0" style="font-size: 8px;font-weight: 500;">Good for 1 person</p>
+                                </div>
+                            </div>
+                            <div class="option align-items-center gap-2">
+                                <div class="mychk h-100">
+                                    <input type="checkbox" id="double_room" name="dorm_types" value="Double Room">
+                                    <label for="double_room"></label>
+                                </div>
+                                <div class="h-100">
+                                    <label for="double_room" class="fs12 fw500">Double Room</label>
+                                    <p class="m-0" style="font-size: 8px;font-weight: 500;">Good for 2 person</p>
+                                </div>
+                            </div>
+                            <div class="option align-items-center gap-2">
+                                <div class="mychk h-100">
+                                    <input type="checkbox" id="deluxe_room" name="dorm_types" value="Deluxe Room">
+                                    <label for="deluxe_room"></label>
+                                </div>
+                                <div class="h-100">
+                                    <label for="deluxe_room" class="fs12 fw500">Deluxe Room</label>
+                                    <p class="m-0" style="font-size: 8px;font-weight: 500;">Good for 4 person</p>
+                                </div>
+                            </div>
+                            <div class="option align-items-center gap-2">
+                                <div class="mychk h-100">
+                                    <input type="checkbox" id="apartment_style" name="dorm_types" value="Apartment Style">
+                                    <label for="apartment_style"></label>
+                                </div>
+                                <div class="h-100">
+                                    <label for="apartment_style" class="fs12 fw500">Apartment Style</label>
+                                    <p class="m-0" style="font-size: 8px;font-weight: 500;">Good for 6 person</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amenities -->
+                <div class="col-xl-3">
+                    <h3>Amenities</h3>
+                    <div class="typechk">
+                        {% for amenity in amenitiess %}
+                            <div class="option align-items-center gap-2">
+                                <div class="mychk h-100">
+                                    <input type="checkbox" id="{{ amenity.id }}" name="amenities" value="{{ amenity.id }}" {% if amenity.id in amenities %}checked{% endif %}>
+                                    <label for="{{ amenity.id }}"></label>
+                                </div>
+                                <div class="h-100">
+                                    <label for="{{ amenity.id }}" class="fs12 fw500">{{ amenity.name }}</label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Accessibility Features -->
+                <div class="col-xl-3">
+                    <h3>Accessibility features</h3>
+                
+                    <div class="typechk">
+                
+
+                        {% for accessibility_feature in accessibility_features %}
+                            <div class="option align-items-center gap-2">
+                                <div class="mychk h-100">
+                                    <input type="checkbox" id="accessibility_feature{{ accessibility_feature.id }}" name="accessibility_feature" value="{{ accessibility_feature.id }}" {% if accessibility_feature.id in accessibility_features %}checked{% endif %}>
+                                    <label for="accessibility_feature{{ accessibility_feature.id }}"></label>
+                                </div>
+                                <div class="h-100">
+                                    <label for="{{ accessibility_feature.id }}" class="fs12 fw500">{{ accessibility_feature.name }}</label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+
+
+{% endblock content %}

@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <meta name="Description" content="Enter your description here" /> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <title>Login | DromHunt</title>
+</head>
+
+<body>
+    <div class="wm100 d-flex justify-content-center align-items-center container main-wrapper Login_section">
+        <div class="wm100 ">
+            <h2 class="fs22 fw500">I am...</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="dorm-selection wm100">
+                    <input type="radio" id="looking-for-dorm" name="dorm-option" class="radio-input" value="Hunter" />
+                    <label for="looking-for-dorm" class="login-option mb-3 wm100 fs15 fw500 d-flex mx-auto justify-content-center gap-4 align-items-center">
+                        <div>
+                            <img src="{% static 'assets/media/Logo/search.png' %}" alt="">
+                        </div>
+                        Looking for Dorm
+                    </label>
+    
+                    <input type="radio" id="owner-of-dorm" name="dorm-option" class="radio-input" value="Owner" />
+                    <label for="owner-of-dorm" class="login-option wm100 fs15 fw500 d-flex mx-auto justify-content-center gap-4 align-items-center">
+                        <div>
+                            <img src="{% static 'assets/media/Logo/in_home_mode.png' %}" alt="">
+                        </div>
+                        Owner of Dorm
+                    </label>
+                </div>
+    
+                <div class="fs10 fw400 text-center py-5">
+                    Have an account? <a href="{% url 'login' %}" class="font-color-00296B fw-bold">Sign In</a>
+                </div>
+    
+                <button class="btn-blue fs15 fw400 w-100">Next</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

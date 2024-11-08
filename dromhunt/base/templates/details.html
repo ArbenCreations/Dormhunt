@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block css %}
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css'
+    integrity='sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=='
+    crossorigin='anonymous' />
+<style>
+    .star-rating {
+        display: inline-block;
+        font-size: 30px;
+        cursor: pointer;
+        color: #dcdcdc;
+        /* Unfilled star color */
+    }
+
+    .star-rating .fa-star {
+        transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .star-rating .filled {
+        color: #f5b301;
+        /* Full star color */
+    }
+
+    .star-rating .half {
+        color: #f5b301;
+        background: linear-gradient(to left, #f5b301 50%, #dcdcdc 50%);
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+
+    .star-rating i:hover,
+    .star-rating .hover {
+        color: #f5b301;
+        /* Highlight on hover */
+        transform: scale(1.2);
+        /* Animation effect on hover */
+    }
+
+    .star-rating i.filled,
+    .star-rating i.half {
+        transform: scale(1.1);
+        /* Add slight animation for filled and half stars */
+    }
+</style>
+{% endblock css %}
+{% block title %}
+Details | DromHunt
+{% endblock title %}
+
+{% block content %}
+
+<div class="main-wrapper container">
+    <div class="row py-5 gap-5">
+        <div class="col-xl-6 col-12">
+            <div class="owl-carousel owl-theme position-relative">
+                {% for image in dorm.images.all %}
+                <div class="item">
+                    <img src="{{ image.image.url }}" alt="">
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-body w-100 px-0">
+                <div class="d-flex justify-content-between">
+                    <div class="rommPrice fs15 fw-bold font-color-0055FF">
+                        ₱ {{ dorm.rentalcost.rent }} / Month
+                    </div>
+                    <div>
+                        <i class="far fa-heart font-color-gray-light"></i>
+                    </div>
+                </div>
+                <p class="fs12 fw500 font-color-gray-light p-0 m-0 pt-2">{{ dorm.name }}</p>
+                <div class="rating py-2">
+                    {% for i in 5|range_filter %}
+                    {% comment %} {{i}} {% endcomment %}
+                    {% comment %} {{dorm.reviews_avg_rating | floatformat}} {% endcomment %}
+                    <i
+                        class="{% if i|floatformat < dorm.reviews_avg_rating|floatformat %}fas {% else %}far{% endif %} fa-star"></i>
+                    {% endfor %}
+                    <p class="p-0 m-0 d-inline-block fs10 fw500 ratingCount">
+                        ({{ dorm.reviews_count }})
+                    </p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bed-icon">
+                        <img src="{% static 'assets/media/Logo/bed.svg' %}" alt="">
+                    </div>
+                    <div class="fs12 fw500 font-color-gray-light">
+                        {{ dorm.type_of_dorm }}
+                    </div>
+                    <div
+                        class="fs12 fw500 {% if dorm.availability_status %} font-color-4CAF50 {% else %} text-danger {% endif %}">
+                        {% if dorm.availability_status %}
+                        Available
+                        {% else %}
+                        Not Available
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="fs12 fw600">
+                        Listed by
+                    </div>
+                    <div class="Listed d-flex py-3 gap-3 align-items-center">
+
+                        <div class="profile">
+
+                            <img class='w-100'
+                                src="{% if dorm.owner.profile.profile_pic %}  {{ dorm.owner.profile.profile_pic.url }}{% else %} https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg{% endif %} "
+                                alt="" style='object-fit:cover,object-position:center'>
+                        </div>
+                        <div class="user_info">
+                            <h4 class="fs12 fw600">
+                                {{ dorm.owner.profile.legal_name }}
+                            </h4>
+                            <p class="fs10 fw400 text-black">
+                                Owner
+                            </p>
+                        </div>
+                        <div class="ms-auto">
+                            <a href=""><i class="font-color-0055FF fs22 fas fa-chevron-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="userContact">
+                        <div class="row fs10 fw400 mb-2">
+                            <div class="col-xl-4 co-12 font-color-gray-light">
+                                Email
+                            </div>
+                            <div class="col-xl-4 co-12 text-end">
+                                {{ dorm.owner.email }}
+                            </div>
+                        </div>
+                        <div class="row fs10 fw400">
+                            <div class="col-xl-4 co-12 font-color-gray-light">
+                                Contact number
+                            </div>
+                            <div class="col-xl-4 co-12 text-end">
+                                {{ dorm.owner.profile.phone_number }}
+                            </div>
+                        </div>
+                        {% if request.user.profile.role != 'Owner' %}
+                        <div class="col-xl-6 mt-4 col-12">
+                            <a href="">
+                                <a href="{% url 'messages' %}?chat_id={{ chat_id }}" class="w-100 btn-blue fs12 fw500">
+                                    Book an appointment
+                                </a>
+
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if request.user.profile.role != 'Owner' %}
+            <div class="row mt-4">
+                <div class="col-lg-7">
+                    <h5 class="fs12 fw600">Reviews:</h5>
+
+
+                    {% for review in dorm.reviews.all %}
+                    <div class="p-3 mb-2">
+                        <p class="mb-1 d-flex gap-2 text-black fs12 fw600">
+                            <span>{{ review.reviewer_name }}</span>
+                            {{ review.rating |floatformat}} Star
+                            <span class="text-warning">
+                                {% for i in 5|range_filter %}
+
+                                <i
+                                    class="{% if i|floatformat < review.rating|floatformat %}fas {% else %} far{% endif %}  fa-star "></i>
+                                {% endfor %}
+                            </span>
+                        </p>
+                        <p class="text-muted mb-0 text-black fs10 fw500">{{ review.comment }}</p>
+                    </div>
+                    {% endfor %}
+
+                    <form method="POST" action="{% url 'submit-review' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="dorm_id" id="dorm_id" value="{{dorm.id}}">
+
+                        <textarea class="mt-3 fs10 fw500" name='review_text' placeholder="Write your review"></textarea>
+
+                        <div class="form-group">
+                            <label for="star-rating" class='fs10 fw600'>Rating:</label>
+                            <div class="star-rating" id="star-rating">
+                                <i class="fs10 fa fa-star" data-value="1"></i>
+                                <i class="fs10 fa fa-star" data-value="2"></i>
+                                <i class="fs10 fa fa-star" data-value="3"></i>
+                                <i class="fs10 fa fa-star" data-value="4"></i>
+                                <i class="fs10 fa fa-star" data-value="5"></i>
+                            </div>
+                            <input type="hidden" name="rating" id="rating-value" value="0">
+                        </div>
+                        <button type="submit" class="btn btn-blue fs10">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+        <div class="col-lg-5 col-12">
+            <!-- Description -->
+            <h5 class="fs15 fw600">Description</h5>
+            <p class="fs10 fw500">{{ dorm.description }}</p>
+
+            <!-- Unit Details -->
+            <h5>Unit Details</h5>
+            <table class="table table-borderless">
+                <tbody>
+                    {% if dorm.area %}
+                    <tr>
+                        <td class="text-end font-color-gray-light fw600 fs10">Area:</td>
+                        <td class="font-color-gray-light fs10">.........................................................
+                        </td>
+                        <td class="fs12 fw500">{{ dorm.area |floatformat }} sq ft</td>
+                    </tr>
+                    {% endif %}
+
+                    {% if dorm.type_of_dorm %}
+                    <tr>
+                        <td class="text-end font-color-gray-light fw600 fs10">Type of Dorm:</td>
+                        <td class="font-color-gray-light fs10">.........................................................
+                        </td>
+                        <td class="fs12 fw500">{{ dorm.type_of_dorm }}</td>
+                    </tr>
+
+                    {% endif %}
+                    {% if dorm.bathroom %}
+                    <tr>
+                        <td class="text-end font-color-gray-light fw600 fs10">Bathroom:</td>
+                        <td class="font-color-gray-light fs10">.........................................................
+                        </td>
+                        <td class="fs12 fw500">{{ dorm.bathroom }} Bathroom(s)</td>
+                    </tr>
+                    {% endif %}
+
+                    {% if dorm.bed %}
+                    <tr>
+                        <td class="text-end font-color-gray-light fw600 fs10">Bed:</td>
+                        <td class="font-color-gray-light fs10">.........................................................
+                        </td>
+                        <td class="fs12 fw500">{{ dorm.bed }} Bed(s)</td>
+                    </tr>
+                    {% endif %}
+
+                    {% if dorm.bedroom %}
+                    <tr>
+                        <td class="text-end font-color-gray-light fw600 fs10">Bedroom:</td>
+                        <td class="font-color-gray-light fs10">.........................................................
+                        </td>
+                        <td class="fs12 fw500">{{ dorm.bedroom }} Bedroom(s)</td>
+                    </tr>
+                    {% endif %}
+
+                    {% if dorm.study_area %}
+                    <tr>
+                        <td class="text-end font-color-gray-light fw600 fs10">Study Area:</td>
+                        <td class="font-color-gray-light fs10">.........................................................
+                        </td>
+                        <td class="fs12 fw500">{{ dorm.study_area }} Table(s)</td>
+                    </tr>
+                    {% endif %}
+
+                </tbody>
+            </table>
+
+            <!-- Rental Costs -->
+            <h5>Rental Costs</h5>
+            <table class="table table-borderless w-100">
+                <tbody>
+                    <tr>
+                        <td class="text-start font-color-gray-light fw600 fs10">Rent:</td>
+                        <td class="fs12 fw500 text-end">₱ {{ dorm.rentalcost.rent |floatformat }} / month</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start font-color-gray-light fw600 fs10">Deposit:</td>
+                        <td class="fs12 fw500 text-end">₱ {{ dorm.rentalcost.deposit |floatformat }} Deposit</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start font-color-gray-light fw600 fs10">Utilities:</td>
+                        <td class="fs12 fw500 text-end">₱ {{ dorm.rentalcost.utilities |floatformat }} / month</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Location -->
+            <h5>Location</h5>
+            <p class="font-color-gray-light fs10 fw500">{{ dorm.location.address }}</p>
+            <div class="Map">
+                {% comment %} {{ dorm.location.google_map_embed_code }} {% endcomment %}
+                <iframe class="w-100 h-100" src="{{ dorm.location.google_map_embed_code }}" style="border:0;"
+                    allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            {% if request.user.profile.role == 'Owner' %}
+            <div class="fs12 fw500 my-2">
+                <a href='{% url "removedorm" dorm.id  %}' class='btn btn-danger'><i class='fa fa-trash'></i> Remove
+                    listing</a>
+            </div>
+            {% endif %}
+
+            {% comment %} <div class="d-flex justify-content-start gap-4 text-muted py-2">
+                <div class="">
+                    <div class="fs10 fw500"><span class="font-color-gray-light">Schools: </span> {{
+                        dorm.location.nearby_schools }} Schools</div>
+                    <div class="fs10 fw500"><span class="font-color-gray-light">Grocery Stores: </span> {{
+                        dorm.location.grocery_stores }} Grocery Stores</div>
+                    <div class="fs10 fw500"><span class="font-color-gray-light">Transit: </span> {{
+                        dorm.location.transit_options }}</div>
+                </div>
+                <div class="">
+                    <div class="fs10 fw500"><span class="font-color-gray-light">Malls: </span> {{ dorm.location.malls }}
+                        Malls</div>
+                    <div class="fs10 fw500"><span class="font-color-gray-light">Restaurants: </span> {{
+                        dorm.location.restaurants }} Restaurants</div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+
+
+
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'
+    integrity='sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=='
+    crossorigin='anonymous'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js'
+    integrity='sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw=='
+    crossorigin='anonymous'></script>
+
+<script>
+    $('.owl-carousel').owlCarousel({
+        loop: true,
+        margin: 10,
+        nav: false,
+        dots: true,
+        autoplay: true,
+        autotimeout: 1000,
+        responsive: {
+            0: {
+                items: 1
+            },
+            600: {
+                items: 1
+            },
+            1000: {
+                items: 1
+            }
+        }
+    })
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('.star-rating i');
+        const ratingInput = document.getElementById('rating-value');
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function () {
+                const rating = parseFloat(this.getAttribute('data-value'));
+                setStars(rating);
+            });
+
+            star.addEventListener('mouseout', function () {
+                const currentRating = parseFloat(ratingInput.value);
+                setStars(currentRating);
+            });
+
+            star.addEventListener('click', function () {
+                const rating = parseFloat(this.getAttribute('data-value'));
+                ratingInput.value = rating;
+                setStars(rating);
+            });
+        });
+
+        function setStars(rating) {
+            stars.forEach(star => {
+                const starValue = parseFloat(star.getAttribute('data-value'));
+                const isHalfStar = starValue - 0.5 <= rating && starValue > rating;
+
+                // Full star: Apply 'filled' class
+                if (starValue <= rating) {
+                    star.classList.add('filled');
+                    star.classList.remove('half');
+                }
+                // Half star: Apply 'half' class
+                else if (isHalfStar) {
+                    star.classList.add('half');
+                    star.classList.remove('filled');
+                }
+                // Empty star: Remove 'filled' and 'half' classes
+                else {
+                    star.classList.remove('filled', 'half');
+                }
+            });
+        }
+    });
+
+</script>
+
+{% endblock scripts %}

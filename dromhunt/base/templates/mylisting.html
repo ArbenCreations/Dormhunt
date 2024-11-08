@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+
+DromHunt
+{% endblock title %}
+
+{% block content %}
+<div class="container main-wrapper">
+
+    <section class="recommendations">
+        <h2 class="fs18 fw500">My listing</h2>
+        <div class="Dromcards d-flex justify-content-xl-start justify-content-center gap-2 flex-wrap">
+            {% if dorms %}
+            
+            {% for dorm in dorms %}
+            <div class="card border-0 col-xl-4 wm100">
+                <a href="{% url "dorm_detail" dorm.id %}">
+                <div class="card-img w-100">
+                    {% if dorm.images.all %}
+                        <img class="w-100" src="{{ dorm.images.first.image.url }}" alt="">
+                    {% else %}
+                        <img class="w-100" src="{% static 'assets/media/default-dorm-image.png' %}" alt="Dorm Image">
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="roomPrice fs15 fw-bold font-color-0055FF">
+                            ₱ {{ dorm.rentalcost.rent }} / Month
+                        </div>
+                        <div>
+                            {% if request.user.is_authenticated %}
+                                {% if dorm.id in user_favorites_ids %}
+                                    <!-- If the dorm is already favorited, show remove button -->
+                                    <a href="{% url 'remove_from_favorites' dorm.id %}">
+                                        <i class="fas fa-heart text-danger"></i>
+                                    </a>
+                                {% else %}
+                                    <!-- If the dorm is not favorited, show add button -->
+                                    <a href="{% url 'add_to_favorites' dorm.id %}">
+                                        <i class="far fa-heart font-color-gray-light"></i>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <i class="far fa-heart font-color-gray-light"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="fs12 fw500 font-color-gray-light p-0 m-0">{{ dorm.name }}</p>
+                    <div class='d-flex gap-2 align-items-center justify-content-between'>
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="bed-icon">
+                                <img src="{% static 'assets/media/Logo/bed.svg' %}" alt="">
+                            </div>
+                            <div class="fs12 fw500 font-color-gray-light">
+                                {{ dorm.type_of_dorm }}
+                            </div>
+                        </div>
+                        <div class="fs12 fw500">
+                                <a href='{% url "removedorm" dorm.id  %}' class='btn btn-danger'><i class='fa fa-trash'></i></a>
+                            </div>
+                    </div>
+                </div>
+            </a>
+            </div>
+        
+    {% endfor %}
+            {% else %}
+
+            No Listing yet , <a class='font-color-0055FF' href='{% url "owner_dashboard" %}'> add new listing</a>
+            {% endif %}
+        </div>
+    </section>
+
+</div>
+
+
+{% endblock content %}
+

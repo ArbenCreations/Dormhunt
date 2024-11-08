@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+
+DromHunt
+{% endblock title %}
+
+{% block content %}
+<div class="container main-wrapper">
+
+    <section class="searchSection py-5 position-relative">
+        <h1 class="fs25 fw500 col-xl-4 mx-auto text-center">
+            Let’s find you the best Dormitory!
+        </h1>
+        <div class="position-relative searchBar wm100 my-4 d-flex align-items-center col-xl-6 mx-auto border-blue-dark border">
+            <form action="{% url 'dorm_search' %}" method="get" class="w-100 d-flex" autocomplete="off">
+                <input type="text" id="search-input" name="query" class="w-100 border-0 fs13 fw300 px-4" placeholder="Search" role="search">
+                <button type="submit" class="btn">
+                    <img src="{% static 'assets/media/Logo/near_me.svg' %}" alt="Search" role="search">
+                </button>
+            </form>
+            
+        </div>
+        <div id="suggestions-list" class="col-xl-6 col-12 mx-auto ">
+            <ul  class="suggestions-dropdown">
+            </ul>
+        </div>
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const suggestionsList = document.getElementById('suggestions-list');
+    
+            searchInput.addEventListener('input', function() {
+                const query = searchInput.value.trim();
+                if (query.length > 1) {
+                    fetch(`/dorm-suggestions/?query=${query}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            suggestionsList.innerHTML = '';  // Clear previous suggestions
+                            if (data.suggestions.length > 0) {
+                                data.suggestions.forEach(item => {
+                                    const listItem = document.createElement('li');
+                                    listItem.innerHTML = '<a class="fs12 fw500 w-100 d-block text-primary text-capitalize" style="padding: 20px;cursor: pointer;border-bottom: 1px solid rgba(0, 0, 0, 0.199);" href="/dorm/'+item.id+'">'+item.name+'</a>';
+                                    listItem.onclick = () => {
+                                        searchInput.value = item.name;
+                                        suggestionsList.innerHTML = '';  // Clear suggestions after selection
+                                    };
+                                    suggestionsList.appendChild(listItem);
+                                });
+                            }
+                        });
+                } else {
+                    suggestionsList.innerHTML = '';  // Clear suggestions if query is too short
+                }
+            });
+        });
+    </script>
+    <section class="recommendations">
+        <h2 class="fs18 fw500">Recommendations</h2>
+        <div class="Dromcards d-flex justify-content-xl-start justify-content-center gap-2 flex-xl-wrap flex-wrap">
+            {% for dorm in dorms %}
+            <div class="card border-0 col-xl-4 wm100">
+                <a href="{% url 'dorm_detail' dorm.id %}">
+                    <div class="card-img w-100">
+                        {% if dorm.images.all %}
+                        <img class="w-100" src="{{ dorm.images.first.image.url }}" alt="">
+                        {% else %}
+                        <img class="w-100" src="{% static 'assets/media/default-dorm-image.png' %}" alt="Dorm Image">
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div class="roomPrice fs15 fw-bold font-color-0055FF">
+                                ₱ {{ dorm.rentalcost.rent }} / Month
+                            </div>
+                            <div>
+                                {% if request.user.is_authenticated %}
+                                {% if dorm.id in user_favorites_ids %}
+                                    <!-- If the dorm is already favorited, show remove button -->
+                                    <a href="{% url 'remove_from_favorites' dorm.id %}">
+                                        <i class="fas fa-heart text-danger"></i>
+                                    </a>
+                                {% else %}
+                                    <!-- If the dorm is not favorited, show add button -->
+                                    <a href="{% url 'add_to_favorites' dorm.id %}">
+                                        <i class="far fa-heart font-color-gray-light"></i>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <i class="far fa-heart font-color-gray-light"></i>
+                            {% endif %}
+                            
+                            </div>
+                        </div>
+                        <p class="fs12 fw500 font-color-gray-light p-0 m-0">{{ dorm.name }}</p>
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="bed-icon">
+                                <img src="{% static 'assets/media/Logo/bed.svg' %}" alt="">
+                            </div>
+                            <div class="fs12 fw500 font-color-gray-light">
+                                {{ dorm.type_of_dorm }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+
+{% endblock content %}

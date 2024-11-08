@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<style>
+    #confirmation-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    button {
+        margin: 5px;
+    }
+    
+</style>
+{% endblock css %}
+{% block title %}
+Profile | DromHunt
+{% endblock title %}
+
+{% block content %}
+<div class="wm100 py-5 d-flex justify-content-center align-items-center container main-wrapper">
+    <div class="wm100 col-xl-6">
+        <div class="profile_pic text-center position-relative w-100">
+            <div class="pic mx-auto" style="background-image: url('{% if profile.profile_pic %}  {{ profile.profile_pic.url }}{% else %} https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg{% endif %}');">
+                <div class="edit_pic">
+                    <a href="#" id="edit-pic">
+                        <img src="{% static 'assets/media/Logo/edit_square.svg' %}" alt="Edit">
+                        
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% if form.profile_pic.errors %}
+        <div class="alert alert-danger mt-2">
+            {% for error in form.profile_pic.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+        <!-- Edit Profile Picture Form (Initially Hidden) -->
+        <form id="edit-pic-form" method="POST" enctype="multipart/form-data" style="display: none;">
+            {% csrf_token %}
+            {% comment %} {{ form.profile_pic }} {% endcomment %}
+            <input type="file" name="profile_pic" class="form-control">
+            <button type="submit" name='update_pic' class="btn btn-primary">Save</button>
+        </form>
+
+        <h1 class="fs20 pt-3 justify-content-center fw600 d-flex align-items-center text-nowrap gap-2">
+            {{ profile.display_name }}
+            {% comment %} {% if profile.user.is_verified %} {% endcomment %}
+                <i class="fa fa-check-circle font-color-0055FF"></i>
+            {% comment %} {% endif %} {% endcomment %}
+        </h1>
+
+        <p class="fs12 fw500 text-center pb-4">{{ profile.occupation }}</p>
+
+        <!-- Legal Name Section -->
+        <div class="w-100 mb-4">
+            <div class="d-flex justify-content-between">
+                <h3 class="fs16 fw500">Legal name</h3>
+                <a href="#" class="fs12 fw500 text-decoration-underline" id="edit-name-btn">Edit</a>
+            </div>
+            <p class="fs12 fw500" id="legal-name">{{ profile.display_name }}</p>
+
+            <form id="edit-name-form" method="POST" style="display: none;">
+                {% csrf_token %}
+                {{ form.display_name }}
+                <button type="submit" name="update_profile" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+        <div class="w-100 mb-4">
+            <div class="d-flex justify-content-between">
+                <h3 class="fs16 fw500">Email</h3>
+                <a href="#" class="fs12 fw500 text-decoration-underline" id="edit-email-btn">Edit</a>
+            </div>
+            <p class="fs12 fw500" id="email">{{ profile.user.email }}</p>
+        
+            <!-- Edit Email Form (Initially Hidden) -->
+            <form id="edit-email-form" method="POST" style="display: none;">
+                {% csrf_token %}
+                <input type="email" name="email" value="{{ user.email }}" class="form-control">
+                <button type="submit" name="update_email" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+        <!-- Phone Number Section -->
+        <div class="w-100 mb-4">
+            <div class="d-flex justify-content-between">
+                <h3 class="fs16 fw500">Phone number</h3>
+                <a href="#" class="fs12 fw500 text-decoration-underline" id="edit-phone-btn">Edit</a>
+            </div>
+            <p class="fs12 fw500" id="phone-number">{{ profile.phone_number }}</p>
+
+            <form id="edit-phone-form" method="POST" style="display: none;">
+                {% csrf_token %}
+                {% comment %} {{ form.phone_number }} {% endcomment %}
+                <input type="text" name="phone_number" value="{{ profile.phone_number }}" class="form-control">
+
+                <button type="submit" name="update_number" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+ <!-- Update Password Section -->
+ <div class="w-100 mb-4">
+    <div class="d-flex justify-content-between">
+        <h3 class="fs16 fw500">
+            Update password
+        </h3>
+        <a href="#" class="fs12 fw500 text-decoration-underline" id="edit-password-btn">Update</a>
+    </div>
+    <p class="fs12 fw500">Change your password</p>
+
+    <!-- Hidden Password Change Form -->
+    <form id="edit-password-form" method="POST" style="display: none;">
+        {% csrf_token %}
+        {{ password_form.as_p }}  <!-- This will render the password change fields -->
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+        <!-- ID Document Section -->
+        <div class="w-100 mb-4">
+            <div class="d-flex justify-content-between">
+                <h3 class="fs16 fw500">ID Document</h3>
+                <a href="#" class="fs12 fw500 text-decoration-underline" id="edit-id-doc-btn">Edit</a>
+            </div>
+            <p class="fs12 fw500" id="id-doc">{{ profile.id_document_type }}</p>
+
+            <form id="edit-id-doc-form" method="POST" style="display: none;">
+                {% csrf_token %}
+                <input type="text" name="id_document_type" value="{{ profile.id_document_type }}" class="form-control">
+
+                {% comment %} {{ form.id_document_type }} {% endcomment %}
+                <button type="submit" name="update_profile" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+
+        
+
+       
+
+        <!-- Other Profile Sections (same as before) -->
+        <a href='{% url "logout" %}' id="confirm-delete" class="btn btn-danger">Logout</a>
+
+      <!-- Deactivate Account -->
+<div class="w-100 mb-2">
+    <a href="#" class="fs16 font-color-0055FF fw500" id="deactivate-account-btn">Deactivate account</a>
+</div>
+
+<!-- Delete Account -->
+<div class="w-100">
+    <a href="#" class="fs16 font-color-0055FF fw500" id="delete-account-btn">Delete account</a>
+</div>
+
+<!-- Deactivation/Deletion Confirmation Modal -->
+<div id="confirmation-modal" style="display: none;">
+    <div class="modal-content">
+        <p class='fs15 lh-sm fw500'>Are you sure you want to deactivate or delete your account? This action is irreversible.</p>
+        <button id="confirm-deactivate" class="btn btn-danger">Deactivate</button>
+        <button id="confirm-delete" class="btn btn-danger">Delete</button>
+        <button id="cancel-action" class="btn btn-secondary">Cancel</button>
+    </div>
+</div>
+    </div>
+</div>
+
+<!-- JavaScript to handle the toggle -->
+<script>
+
+    document.getElementById("edit-pic").addEventListener("click", function(event) {
+        event.preventDefault();
+
+        // Toggle visibility of the profile picture and form
+        var profilePic = document.querySelector('.profile_pic');
+        var picForm = document.getElementById("edit-pic-form");
+
+        // Show the form to upload a new picture and hide the current picture
+        profilePic.style.display = profilePic.style.display === "none" ? "block" : "none";
+        picForm.style.display = picForm.style.display === "none" ? "block" : "none";
+    });
+    document.getElementById("edit-email-btn").addEventListener("click", function(event) {
+        event.preventDefault();
+
+        // Toggle visibility of the email paragraph and form
+        var emailParagraph = document.getElementById("email");
+        var emailForm = document.getElementById("edit-email-form");
+
+        // Show form and hide the email text
+        emailParagraph.style.display = emailParagraph.style.display === "none" ? "block" : "none";
+        emailForm.style.display = emailForm.style.display === "none" ? "block" : "none";
+    });
+    document.getElementById("deactivate-account-btn").addEventListener("click", function(event) {
+        event.preventDefault();
+        openConfirmationModal("deactivate");
+    });
+
+    document.getElementById("delete-account-btn").addEventListener("click", function(event) {
+        event.preventDefault();
+        openConfirmationModal("delete");
+    });
+
+    function openConfirmationModal(actionType) {
+        var modal = document.getElementById("confirmation-modal");
+        modal.style.display = "flex";
+
+        document.getElementById("confirm-deactivate").onclick = function() {
+            window.location.href = `{% url 'deactivate_account' %}`;
+        };
+
+        document.getElementById("confirm-delete").onclick = function() {
+            window.location.href = `{% url 'delete_account' %}`;
+        };
+
+        document.getElementById("cancel-action").onclick = function() {
+            modal.style.display = "none";
+        };
+    }
+    document.getElementById("edit-name-btn").addEventListener("click", function(event) {
+        event.preventDefault();
+        toggleEditForm("edit-name-form", "legal-name");
+    });
+
+    document.getElementById("edit-phone-btn").addEventListener("click", function(event) {
+        event.preventDefault();
+        toggleEditForm("edit-phone-form", "phone-number");
+    });
+
+    document.getElementById("edit-id-doc-btn").addEventListener("click", function(event) {
+        event.preventDefault();
+        toggleEditForm("edit-id-doc-form", "id-doc");
+    });
+    document.getElementById("edit-password-btn").addEventListener("click", function(event) {
+        event.preventDefault();
+        toggleEditForm("edit-password-form");
+    });
+
+    function toggleEditForm(formId, textId) {
+        var form = document.getElementById(formId);
+        var textElement = document.getElementById(textId);
+
+        // Toggle visibility of form and text
+        if (form.style.display === "none" || form.style.display === "") {
+            form.style.display = "block";
+            textElement.style.display = "none";
+        } else {
+            form.style.display = "none";
+            textElement.style.display = "block";
+        }
+    }
+</script>
+
+
+
+
+{% endblock content %}

@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container main-wrapper">
+    <div class="d-flex justify-content-between">
+        <!-- Users List Section (Visible on large screens) -->
+        <div class="col-xl-4 col-12 Users pt-5 pe-4 d-none d-xl-block">
+            <h3 class="fs20 fw600 pt-xl-5">
+                Messages
+            </h3>
+            <div class="userlist py-4 d-flex flex-column gap-2">
+                {% for chat in chat_data %}
+
+                <div class="usercard d-flex gap-3" data-chat-id="{{ chat.chat_id }}"
+                    onclick="openChat('{{ chat.chat_id }}')">
+                    <div class="profile">
+                        <img src="{{ chat.profile_pic }}" alt="">
+                    </div>
+                    <div class="user_info">
+                        <h4 class="fs15 fw600">{{ chat.chat_user }}</h4>
+                        <p class="fs10 fw500 {{ chat.last_message.read|yesno:" active," }}">
+                            {{ chat.last_message.content|truncatewords:5 }}
+                        </p>
+                    </div>
+                    <div class="chatInfo ms-auto">
+                        <p class="chatTime fs8 fw500 p-0 mb-1">{{ chat.last_message.timestamp|date:"h:i A" }}</p>
+                        {% if chat.unread_count %}
+                        <div class="d-flex justify-content-end">
+                            <div class="chatCount fs10 fw500">{{ chat.unread_count }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- Mobile View Offcanvas -->
+        <div class="d-block d-xl-none">
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample"
+                aria-labelledby="offcanvasExampleLabel">
+                <div class="offcanvas-body">
+                    <div class="Users pt-5 pe-4">
+                        <div class="offcanvas-header">
+                            <h3 class="fs20 fw600 pt-xl-5">Messages</h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                        </div>
+
+                        <div class="userlist py-4 d-flex flex-column gap-2">
+                            {% for chat in chat_data %}
+                            <div class="usercard d-flex gap-3">
+                                <div class="profile">
+                                    <img src="{{ chat.profile_pic }}" alt="">
+                                </div>
+                                <div class="user_info">
+                                    <h4 class="fs15 fw600">{{ chat.chat_user }}</h4>
+                                    <p class="fs10 fw500 {{ chat.last_message.read|yesno:" active," }}">
+                                        {{ chat.last_message.content|truncatewords:5 }}
+                                    </p>
+                                </div>
+                                <div class="chatInfo ms-auto">
+                                    <p class="chatTime fs8 fw500 p-0 mb-1">{{ chat.last_message.timestamp|date:"h:i A"
+                                        }}</p>
+                                    {% if chat.unread_count %}
+                                    <div class="d-flex justify-content-end">
+                                        <div class="chatCount fs10 fw500">{{ chat.unread_count }}</div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Message Section -->
+        <div class="col-xl-8 col-12 message_box ps-xl-5 pe-xl-0 px-2">
+            <a class="btn btn-primary my-4 d-block d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasExample"
+                role="button" aria-controls="offcanvasExample">
+                All Messages
+            </a>
+
+            <h3 class="fs14 fw600">{{ chat_user.username }}</h3>
+            <div class="messageSection mt-xl-5 pt-5" id="messageSection">
+                {% for message in messages %}
+                <div class="{% if message.sender == request.user.username %}sender{% else %}recive{% endif %}">
+                    <p>{{ message.content }}</p>
+                    <div class="d-flex justify-content-end gap-2 align-items-center">
+                        <span class="font-color-gray-light fs8 fw500">{{ message.timestamp|date:"h:i A" }}</span>
+
+                        {% if message.status == "delivered" %}
+                        <div><img src="{% static 'assets/media/Logo/done_all.png' %}" alt=""></div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="messageInput">
+                <div class="d-flex w-100 gap-2 align-items-center">
+                    <input type="text" id="chatMessageInput" class="fs10 fw500 px-3" placeholder="Write a message...">
+                    <button class="btn-send" id="sendButton">
+                        <img src="{% static 'assets/media/send.png' %}" alt="">
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const chatId = urlParams.get('chat_id');
+
+        if (chatId) {
+            openChat(chatId);  // Opens the chat if chat_id is present in URL
+        }
+    });
+
+</script>
+<script>
+    const chatId = "{{ request.user.id }}";
+
+
+
+    const wsUrl = window.location.protocol === "https:"
+        ? `wss://${window.location.host}/ws/chat/${chatId}/`
+        : `ws://${window.location.host}/ws/chat/${chatId}/`;
+
+    const chatSocket = new WebSocket(wsUrl);
+
+
+    chatSocket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        console.log("Received message:", data);
+
+        const messageSection = document.getElementById("messageSection");
+
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = data.sender === "{{ request.user.username }}" ? "sender" : "recive";
+        messageDiv.innerHTML = `
+            <p>${data.message}</p>
+            <div class="d-flex justify-content-end gap-2 align-items-center">
+                <span class="font-color-gray-light fs8 fw500">${data.timestamp}</span>
+            </div>`;
+
+        messageSection.appendChild(messageDiv);
+        messageSection.scrollTop = messageSection.scrollHeight;  // Auto scroll to the latest message
+    };
+
+    // Handle WebSocket close event
+    chatSocket.onclose = function () {
+        console.error('Chat socket closed unexpectedly');
+        // Optionally handle reconnect logic here
+    };
+
+    // Button click handler for sending messages
+    document.getElementById("sendButton").onclick = function () {
+        const messageInput = document.getElementById("chatMessageInput");
+        const message = messageInput.value;
+        const receiverUserName = document.querySelector('.message_box h3').textContent.trim();
+        // Debugging: Check if message is being retrieved correctly
+        console.log("Message to send:", message);
+
+        if (message) {
+            // Send the message through WebSocket
+            const dataToSend = {
+                'content': message,
+                'sender': "{{ request.user.username }}",
+                'reciever': receiverUserName
+
+            };
+            console.log("Sending message data:", dataToSend);  // Log the message data
+
+            chatSocket.send(JSON.stringify(dataToSend));  // Send message to the server
+            messageInput.value = '';  // Clear input field after sending
+        }
+    };
+</script>
+
+
+<script>
+    function openChat(chatId) {
+        // Change the chat_user to the selected user's chat
+        const chatUserName = document.querySelector(`[data-chat-id="${chatId}"] .user_info h4`).textContent;
+        document.querySelector('.message_box h3').textContent = chatUserName;
+
+        // Update the message section (this could be done via AJAX or WebSocket)
+        fetchMessages(chatId);
+
+        // Optionally, scroll to the top to show the new conversation
+        const messageSection = document.getElementById("messageSection");
+        messageSection.scrollTop = 0; // Scroll to the top of the messages
+    }
+
+    function fetchMessages(chatId) {
+        // This fetch can be replaced by a WebSocket message if you're using WebSocket to fetch chat messages
+        fetch(`/chat/messages/${chatId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const messageSection = document.getElementById("messageSection");
+                messageSection.innerHTML = ''; // Clear current messages
+
+                data.messages.forEach(message => {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = message.sender === "{{ request.user.username }}" ? "sender" : "recive";
+                    messageDiv.innerHTML = `<p>${message.content}</p><div class="d-flex justify-content-end gap-2 align-items-center"><span class="font-color-gray-light fs8 fw500">${message.timestamp}</span></div>`;
+                    messageSection.appendChild(messageDiv);
+                });
+
+                messageSection.scrollTop = messageSection.scrollHeight; // Scroll to the latest message
+            })
+            .catch(error => console.error('Error fetching messages:', error));
+    }
+
+</script>
+{% endblock %}
