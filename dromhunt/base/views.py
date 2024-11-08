@@ -91,7 +91,10 @@ def Chatmessages(request):
     chat_id = request.GET.get('chat_id')
 
     dorms = Dorm.objects.all()
-    chatd = Chat.objects.get(id=chat_id)
+    if chat_id:
+        chatd = Chat.objects.get(id=chat_id)
+    else:
+        chatd=''
     # print(chatd.user.id)
     # Retrieve chats where the current user is either the sender or the recipient.
     chats = Chat.objects.filter(
